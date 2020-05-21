@@ -61,6 +61,7 @@
       ---------------------------------------------------------------------- '''
 
 from .instrument import *
+from .pupil import *
 import numpy as np
 from numpy.fft import fftshift as shift
 from numpy.fft import fft2 as fft

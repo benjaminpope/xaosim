@@ -565,6 +565,54 @@ def PHARO(PSZ, rad, mask="std", between_pix=True, ang=0):
     return res
 
 # ==================================================================
+def PHARO_MED_FULL(PSZ, rad, mask="std", between_pix=True, ang=0):
+    ''' ---------------------------------------------------------
+    returns an array that draws the pupil of the PHARO camera
+    of the Palomar Hale telescope, at the center of an array of
+    size "PSZ" with radius "radius" (both in pixels).
+
+    Parameters:
+    ----------
+    - PSZ:     size of the array (assumed to be square)
+    - rad:     radius of the standard pupil (in pixels)
+    - mask:    aperture mask used
+      + "std": standard cross (default)
+      + "med": medium cross
+    - between_pix: flag
+    - ang:     global rotation of the pupil (in degrees)
+
+    Notes:
+    -----
+    The reference is the standard cross radius, which corresponds
+    to an actual 4.978 m clear aperture on the telescope. The
+    central obstruction diameter is then 1.841 m (standard cross).
+
+    The med_cross corresponds to a 4.646 m clear aperture,
+    and a 2.293 central obstruction.
+    
+    See Hayward et al (2000) in PASP for reference.
+    --------------------------------------------------------- '''
+    xx,yy  = np.meshgrid(np.arange(PSZ)-PSZ/2, np.arange(PSZ)-PSZ/2)
+
+    if between_pix is True:
+        xx += 0.5
+        yy += 0.5
+
+    mydist = np.hypot(yy,xx)
+
+    res = np.zeros_like(mydist)
+
+    res[mydist <= 0.933/0.933 * rad]   = 1.0 # undersized aperture
+    res[mydist <= 0.460/0.933 * rad]   = 0.0 # oversized obstruction
+    res[np.abs(xx) < 0.05/0.933 * rad] = 0.0 # fat spiders
+    res[np.abs(yy) < 0.05/0.933 * rad] = 0.0 # fat spiders
+
+    if ang is not 0:
+        res = rotate(res, ang, order=0, reshape=False)
+    return res
+
+
+# ==================================================================
 def VLT(n,m, radius, spiders=True, between_pix=True):
     ''' ---------------------------------------------------------
     returns an array that draws the pupil of the VLT
