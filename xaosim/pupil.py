@@ -409,7 +409,7 @@ def HST(xs,ys, radius, spiders=True, between_pix=True):
                             spiders=spiders, between_pix=between_pix))
 
 # ======================================================================
-def HST_NIC1(PSZ, rad, between_pix=True, ang=0):
+def HST_NIC1(PSZ, rad, between_pix=True, ang=45):
     ''' ---------------------------------------------------------
     returns an array that draws the pupil of HST/NICMOS1 camera
 
@@ -476,9 +476,15 @@ def HST_NIC1(PSZ, rad, between_pix=True, ang=0):
         np.roll(NCM, int(-0.0 * rad), axis=1),
         int(-0.08 * rad), axis=0) # MASK SHIFT !!
     res = 1.0 * (OTA * NCM)
+
+    res = np.roll(
+        np.roll(res, int(-0.0 * rad), axis=1),
+        int(0.08 * rad), axis=0) # shift it back after applying the mask
+
     
     if ang is not 0:
         res = rotate(res, ang, order=0, reshape=False)
+
     return res
 
 # ==================================================================
